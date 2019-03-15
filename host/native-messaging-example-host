@@ -26,7 +26,7 @@ if sys.platform == "win32":
 # Helper function that sends a message to the webapp.
 def send_message(message):
    # Write message size.
-  sys.stdout.write(struct.pack('I', len(message)))
+  sys.stdout.buffer.write(struct.pack('I', len(message)))
   # Write the message itself.
   sys.stdout.write(message)
   sys.stdout.flush()
