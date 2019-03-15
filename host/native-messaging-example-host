@@ -12,10 +12,9 @@ import threading
 import queue
 
 try:
-  import Tkinter
-  import tkMessageBox
+  import tkinter
 except ImportError:
-  Tkinter = None
+  tkinter = None
 
 # On Windows, the default I/O mode is O_TEXT. Set this to O_BINARY
 # to avoid unwanted modifications of the input/output streams.
@@ -56,23 +55,23 @@ def read_thread_func(queue1):
       # In headless mode just send an echo message back.
       send_message('{"echo": %s}' % text)
 
-if Tkinter:
-  class NativeMessagingWindow(Tkinter.Frame):
+if tkinter:
+  class NativeMessagingWindow(tkinter.Frame):
     def __init__(self, queue1):
       self.queue1 = queue1
 
-      Tkinter.Frame.__init__(self)
+      tkinter.Frame.__init__(self)
       self.pack()
 
-      self.text = Tkinter.Text(self)
+      self.text = tkinter.Text(self)
       self.text.grid(row=0, column=0, padx=10, pady=10, columnspan=2)
-      self.text.config(state=Tkinter.DISABLED, height=10, width=40)
+      self.text.config(state=tkinter.DISABLED, height=10, width=40)
 
-      self.messageContent = Tkinter.StringVar()
-      self.sendEntry = Tkinter.Entry(self, textvariable=self.messageContent)
+      self.messageContent = tkinter.StringVar()
+      self.sendEntry = tkinter.Entry(self, textvariable=self.messageContent)
       self.sendEntry.grid(row=1, column=0, padx=10, pady=10)
 
-      self.sendButton = Tkinter.Button(self, text="Send", command=self.onSend)
+      self.sendButton = tkinter.Button(self, text="Send", command=self.onSend)
       self.sendButton.grid(row=1, column=1, padx=10, pady=10)
 
       self.after(100, self.processMessages)
@@ -93,18 +92,18 @@ if Tkinter:
       try:
         send_message(text)
       except IOError:
-        tkMessageBox.showinfo('Native Messaging Example',
+        tkinter.messageBox.showinfo('Native Messaging Example',
                               'Failed to send message.')
         sys.exit(1)
 
     def log(self, message):
-      self.text.config(state=Tkinter.NORMAL)
-      self.text.insert(Tkinter.END, message + "\n")
-      self.text.config(state=Tkinter.DISABLED)
+      self.text.config(state=tkinter.NORMAL)
+      self.text.insert(tkinter.END, message + "\n")
+      self.text.config(state=tkinter.DISABLED)
 
 
 def Main():
-  if not Tkinter:
+  if not tkinter:
     send_message('"Tkinter python module wasn\'t found. Running in headless ' +
                  'mode. Please consider installing Tkinter."')
     read_thread_func(None)
