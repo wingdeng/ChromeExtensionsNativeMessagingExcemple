@@ -9,7 +9,7 @@
 import struct
 import sys
 import threading
-import Queue
+import queue
 
 try:
   import Tkinter
@@ -33,15 +33,15 @@ def send_message(message):
   sys.stdout.flush()
 
 # Thread that reads messages from the webapp.
-def read_thread_func(queue):
+def read_thread_func(queue1):
   message_number = 0
   while 1:
     # Read the message length (first 4 bytes).
     text_length_bytes = sys.stdin.read(4)
 
     if len(text_length_bytes) == 0:
-      if queue:
-        queue.put(None)
+      if queue1:
+        queue1.put(None)
       sys.exit(0)
 
     # Unpack message length as 4 byte integer.
@@ -50,16 +50,16 @@ def read_thread_func(queue):
     # Read the text (JSON object) of the message.
     text = sys.stdin.read(text_length).decode('utf-8')
 
-    if queue:
-      queue.put(text)
+    if queue1:
+      queue1.put(text)
     else:
       # In headless mode just send an echo message back.
       send_message('{"echo": %s}' % text)
 
 if Tkinter:
   class NativeMessagingWindow(Tkinter.Frame):
-    def __init__(self, queue):
-      self.queue = queue
+    def __init__(self, queue1):
+      self.queue1 = queue1
 
       Tkinter.Frame.__init__(self)
       self.pack()
@@ -78,8 +78,8 @@ if Tkinter:
       self.after(100, self.processMessages)
 
     def processMessages(self):
-      while not self.queue.empty():
-        message = self.queue.get_nowait()
+      while not self.queue1.empty():
+        message = self.queue1.get_nowait()
         if message == None:
           self.quit()
           return
@@ -110,12 +110,12 @@ def Main():
     read_thread_func(None)
     sys.exit(0)
 
-  queue = Queue.Queue()
+  queue1 = queue.Queue()
 
-  main_window = NativeMessagingWindow(queue)
+  main_window = NativeMessagingWindow(queue1)
   main_window.master.title('Native Messaging Example')
 
-  thread = threading.Thread(target=read_thread_func, args=(queue,))
+  thread = threading.Thread(target=read_thread_func, args=(queue1,))
   thread.daemon = True
   thread.start()
 
